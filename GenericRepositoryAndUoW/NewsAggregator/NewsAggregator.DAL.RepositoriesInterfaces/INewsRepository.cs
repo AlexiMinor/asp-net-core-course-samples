@@ -6,8 +6,9 @@ using NewsAggregator.DAL.Core.Entities;
 
 namespace NewsAggregator.DAL.Repositories.Interfaces
 {
-    public interface INewsRepository : IRepository<News>
+    public interface IRepositoryWithAdd<T> : IRepository<T> where T : class, IBaseEntity
     {
-        //for unique methods
+        void Add(T entity);
     }
+
 }

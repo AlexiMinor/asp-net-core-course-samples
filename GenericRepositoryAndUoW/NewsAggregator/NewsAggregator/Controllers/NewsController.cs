@@ -1,14 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
 using NewsAggregator.Core.DataTransferObjects;
 using NewsAggregator.Core.Services.Interfaces;
-using NewsAggregator.DAL.Core;
-using NewsAggregator.DAL.Core.Entities;
-using NewsAggregator.Models.ViewModels;
+using NewsAggregator.Models;
+using NewsAggregator.Models.ViewModels.News;
 
 namespace NewsAggregator.Controllers
 {
@@ -23,16 +20,32 @@ namespace NewsAggregator.Controllers
 
         // GET: News
 
-        public async Task<IActionResult> Index(Guid? sourseId)
+        public async Task<IActionResult> Index(Guid? sourseId, int page = 1)
         {
             if (sourseId == null)
             {
                 return NotFound();
             }
-            var model = (await _newsService.GetNewsBySourseId(sourseId))
+            var news = (await _newsService.GetNewsBySourseId(sourseId))
                 .ToList();
 
-            return View(model);
+            var pageSize = 3;
+
+            var newsPerPages = news.Skip((page - 1) * pageSize).Take(pageSize);
+
+            var pageInfo = new PageInfo()
+            {
+                PageNumber = page,
+                PageSize = pageSize,
+                TotalItems = news.Count
+            };
+
+
+            return View(new NewsListWithPaginationInfo()
+            {
+                News = newsPerPages,
+                PageInfo = pageInfo
+            });
         }
 
         // GET: News/Details/5

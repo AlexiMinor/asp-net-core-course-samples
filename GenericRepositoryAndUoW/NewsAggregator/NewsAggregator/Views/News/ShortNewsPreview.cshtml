@@ -1,0 +1,15 @@
+﻿@model NewsAggregator.Core.DataTransferObjects.NewsDto
+
+<div>
+    <h2>@Model.Article</h2>
+    <div>
+        @Model.Body
+    </div>
+    <div>
+        <a asp-action="Details" asp-route-id="@Model.Id">Читать на аггрегаторе</a>
+    </div>
+    <div>
+        <a href="@Model.Url">Читать в источнике</a>
+    </div>
+</div>
+<hr/>

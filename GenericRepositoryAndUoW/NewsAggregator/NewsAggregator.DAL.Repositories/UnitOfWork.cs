@@ -16,7 +16,7 @@ namespace NewsAggregator.DAL.Repositories.Implementation
         private readonly IRepository<RssSourse> _rssRepository;
 
 
-        public UnitOfWork(NewsAggregatorContext db, 
+        public UnitOfWork(NewsAggregatorContext db,
             IRepository<News> newsRepository, 
             IRepository<RssSourse> rssRepository)
         {

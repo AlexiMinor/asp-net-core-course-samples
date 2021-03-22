@@ -9,7 +9,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
+using NewsAggregator.Core.Services.Interfaces;
 using NewsAggregator.DAL.Core;
+using NewsAggregator.DAL.Core.Entities;
+using NewsAggregator.DAL.Repositories.Implementation;
+using NewsAggregator.DAL.Repositories.Interfaces;
+using NewsAggregators.Services.Implementation;
 
 namespace NewsAggregator
 {
@@ -27,6 +32,12 @@ namespace NewsAggregator
         {
             services.AddDbContext<NewsAggregatorContext>(opt =>
                 opt.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            
+            services.AddTransient<IRepository<News>, NewsRepository>(); // for all repositories
+            services.AddTransient<IRepository<RssSourse>, RssSourseRepository>(); // for all repositories
+
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<INewsService, NewsService>();
 
             services.AddControllersWithViews();
         }

@@ -15,7 +15,7 @@ namespace NewsAggregator.DAL.Repositories.Implementation
         protected readonly NewsAggregatorContext Db;
         protected readonly DbSet<T> Table;
 
-        protected Repository(NewsAggregatorContext context, DbSet<T> table)
+        protected Repository(NewsAggregatorContext context)
         {
             Db = context;
             Table = Db.Set<T>(); //return table with type T ->GetSet(Type t)

@@ -10,13 +10,15 @@ using NewsAggregator.DAL.Repositories.Interfaces;
 
 namespace NewsAggregator.DAL.Repositories.Implementation
 {
-    public class RssSourseRepository : Repository<RssSourse>
+    public abstract class RepositoryWithAdd<T> : Repository<T>, IRepositoryWithAdd<T> where T : class, IBaseEntity
     {
-        private readonly NewsAggregatorContext _context;
-
-        public RssSourseRepository(NewsAggregatorContext context) : base(context)
+        protected RepositoryWithAdd(NewsAggregatorContext context) : base(context)
         {
-            _context = context;
+        }
+
+        public void Add(T t)
+        {
+            Table.Add(t);
         }
     }
 }

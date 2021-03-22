@@ -1,4 +1,4 @@
-﻿@model NewsAggregator.DAL.Core.Entities.News
+﻿@model NewsAggregator.Core.DataTransferObjects.NewsWithRssNameDto
 
 @{
     ViewData["Title"] = "Details";
@@ -38,7 +38,7 @@
             Rss Source Name
         </dt>
         <dd class = "col-sm-10">
-            @Model.Comments.Select(comment => comment.User).Select(user => user.Comments)
+            @Model.RssSourseName
         </dd>
     </dl>
 </div>

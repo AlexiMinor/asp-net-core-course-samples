@@ -92,7 +92,7 @@ namespace NewsAggregators.Services.Implementation
                 Body2 = news.Body2
             };
 
-            await _unitOfWork.News.Add(entity);
+            await _unitOfWork.News.AddRange(new []{entity});
         }
 
         public async Task AddRange(IEnumerable<NewsDto> news)

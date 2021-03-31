@@ -12,9 +12,10 @@ namespace NewsAggregator.DAL.Repositories.Interfaces
     {
         Task<T> GetById(Guid id);
         IQueryable<T> FindBy(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes); 
+        IQueryable<T> Get(); 
 
         Task Add(T news);
-        Task AddRange(IEnumerable<T> news);
+        Task AddRange(IEnumerable<T> entities);
 
         Task Update(T news);
         Task Remove(Guid id);

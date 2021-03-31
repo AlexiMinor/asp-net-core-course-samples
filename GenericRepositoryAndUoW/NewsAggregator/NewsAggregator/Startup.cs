@@ -46,6 +46,9 @@ namespace NewsAggregator
             services.AddScoped<INewsService, NewsService>();
             services.AddScoped<IRssSourseService, RssSourseService>();
 
+            services.AddTransient<IWebPageParser, OnlinerParser>();
+            services.AddTransient<IWebPageParser, TutByParser>();
+
             services.AddControllersWithViews();
         }
 

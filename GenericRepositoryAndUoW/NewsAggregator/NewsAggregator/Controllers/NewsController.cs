@@ -1,23 +1,35 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using System.Xml;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NewsAggregator.Core.DataTransferObjects;
 using NewsAggregator.Core.Services.Interfaces;
 using NewsAggregator.Models;
 using NewsAggregator.Models.ViewModels.News;
+using Serilog;
+using System.ServiceModel.Syndication;
 
 namespace NewsAggregator.Controllers
 {
     public class NewsController : Controller
     {
         private readonly INewsService _newsService;
-        private readonly IRssSourseService _rssSourse;
-        public NewsController(INewsService newsService, IRssSourseService rssSourse)
+        private readonly IRssSourseService _rssSourseService;
+        private readonly IWebPageParser _onlinerParser;
+        private readonly IWebPageParser _tutByParser;
+
+        public NewsController(INewsService newsService, 
+            IRssSourseService rssSourse, 
+            IWebPageParser onlinerParser, IWebPageParser tutByParser)
         {
             _newsService = newsService;
-            _rssSourse = rssSourse;
+            _rssSourseService = rssSourse;
+            _onlinerParser = onlinerParser;
+            _tutByParser = tutByParser;
         }
 
         // GET: News
@@ -70,13 +82,66 @@ namespace NewsAggregator.Controllers
                 Id = sourse.Id,
                 Article = sourse.Article,
                 Body = sourse.Body,
-                Body2 = sourse.Body2,
+                Summary = sourse.Summary,
                 Url = sourse.Url,
                 RssSourseId = sourse.RssSourseId,
                 RssSourseName = sourse.RssSourseName // Null reference exception -> RssSourse is null
             };
 
-            return View(sourse);
+            return View(viewModel);
+        }
+
+        public async Task<IActionResult> Aggregate()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Aggregate(CreateNewsViewModel sourse)
+        {
+            try
+            {
+                var stopwatch = new Stopwatch();
+                stopwatch.Start();
+                var rssSourses = await _rssSourseService
+                    .GetAllRssSources();
+                var newInfos = new List<NewsDto>(); // without any duplicate
+                
+                foreach (var rssSourse in rssSourses)
+                {
+                    var newsList = await _newsService
+                        .GetNewsInfoFromRssSourse(rssSourse);
+
+                    if (rssSourse.Id.Equals(new Guid("4B92ABBF-CAB0-493B-8320-857BD2901735")))
+                    {
+                        foreach (var newsDto in newsList)
+                        {
+                           var newsBody = await _onlinerParser.Parse(newsDto.Url);
+                           newsDto.Body = newsBody;
+                        }
+                    }
+                    else if (rssSourse.Id.Equals(new Guid("4B92ABBF-CAB0-493B-8320-857BD2901735")))
+                    {
+                        foreach (var newsDto in newsList)
+                        {
+                            var newsBody = await _onlinerParser.Parse(newsDto.Url);
+                            newsDto.Body = newsBody;
+                        }
+                    }
+                    newInfos.AddRange(newsList);
+                }
+                await _newsService.AddRange(newInfos);
+                stopwatch.Stop();
+                Log.Information($"Aggregation was executed in {stopwatch.ElapsedMilliseconds}");
+            }
+
+            catch (Exception e)
+            {
+                Log.Error(e, $"{e.Message}");
+
+            }
+            return RedirectToAction(nameof(Index));
         }
 
         // GET: News/Create
@@ -85,7 +150,7 @@ namespace NewsAggregator.Controllers
             
             var model = new CreateNewsViewModel()
             {
-                Sources = new SelectList(await _rssSourse.GetAllRssSources(), 
+                Sources = new SelectList(await _rssSourseService.GetAllRssSources(), 
                     "Id", //field of element with value
                     "Name") //field of element with text
             };

@@ -40,14 +40,20 @@ namespace NewsAggregator.DAL.Repositories.Implementation
             return result;
         }
 
+        public IQueryable<T> Get()
+        {
+            return Table;
+        }
+
         public async Task Add(T news)
         {
             throw new NotImplementedException();
         }
 
-        public async Task AddRange(IEnumerable<T> news)
+        public async Task AddRange(IEnumerable<T> entities)
         {
-            throw new NotImplementedException();
+            Table.AddRange(entities);
+
         }
 
         public async Task Update(T news)

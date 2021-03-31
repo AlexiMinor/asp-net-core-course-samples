@@ -4,43 +4,10 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+<h1>@Model.Article</h1>
 
 <div>
-    <h4>News</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Article)
-        </dt>
-        <dd class = "col-sm-10">
-             @Model.Article
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Url)
-        </dt>
-        <dd class = "col-sm-10">
-             @Model.Url
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Body)
-        </dt>
-        <dd class = "col-sm-10">
-             @Model.Body
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Body2)
-        </dt>
-        <dd class = "col-sm-10">
-            @Model.Body2
-        </dd>
-        <dt class = "col-sm-2">
-            Rss Source Name
-        </dt>
-        <dd class = "col-sm-10">
-            @Model.RssSourseName
-        </dd>
-    </dl>
+    @Html.Raw(Model.Body)
 </div>
 <div>
     <a asp-action="Index">Back to List</a>

@@ -1,23 +1,21 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
+using System.ServiceModel.Syndication;
 using System.Threading.Tasks;
+using System.Xml;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using NewsAggregator.Core.DataTransferObjects;
 using NewsAggregator.Core.Services.Interfaces;
-using NewsAggregator.DAL.Core;
 using NewsAggregator.DAL.Core.Entities;
 using NewsAggregator.DAL.Repositories.Implementation;
-using NewsAggregator.DAL.Repositories.Interfaces;
 using Serilog;
 
 namespace NewsAggregators.Services.Implementation
 {
     public class NewsService : INewsService
     {
-        
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuration;
         public NewsService(IUnitOfWork unitOfWork, 
@@ -26,12 +24,7 @@ namespace NewsAggregators.Services.Implementation
             _unitOfWork = unitOfWork;
             _configuration = configuration;
         }
-
-        public async Task<IEnumerable<NewsDto>> FindNews()
-        {
-            throw new NotImplementedException();
-        }
-
+       
         public async Task<IEnumerable<NewsDto>> GetNewsBySourseId(Guid? id)
         {
             if (!id.HasValue)
@@ -54,7 +47,7 @@ namespace NewsAggregators.Services.Implementation
                 Body = n.Body,
                 RssSourseId = n.RssSourseId,
                 Url = n.Url,
-                Body2 = n.Body2
+                Summary = n.Summary
             }).ToList();
         }
 
@@ -68,7 +61,7 @@ namespace NewsAggregators.Services.Implementation
                 Body = entity.Body,
                 RssSourseId = entity.RssSourseId,
                 Url = entity.Url,
-                Body2 = entity.Body2
+                Summary = entity.Summary
             };
         }
 
@@ -79,17 +72,51 @@ namespace NewsAggregators.Services.Implementation
                     n=>n.RssSourse, n=>n.Comments)
                 .Select(n => new NewsWithRssNameDto()
                 {
-                    Id = n.Id
+                    Id = n.Id,
+                    Article = n.Article,
+                    Body = n.Body,
+                    Summary = n.Summary,
+                    Url = n.Url,
+                    RssSourseId = n.RssSourseId,
+                    RssSourseName = n.RssSourse.Name
                 }).FirstOrDefaultAsync();
             return result;
         }
 
-        public async Task Test()
+        public async Task<IEnumerable<NewsDto>> GetNewsInfoFromRssSourse(RssSourseDto rssSourse)
         {
+            var news = new List<NewsDto>();
+            using (var reader = XmlReader.Create(rssSourse.Url))
+            {
+                var feed = SyndicationFeed.Load(reader);
+                reader.Close();
+                if (feed.Items.Any())
+                {
+                    var currentNewsUrls = await _unitOfWork.News
+                        .Get()//rssSourseId must be not nullable
+                        .Select(n => n.Url)
+                        .ToListAsync();
 
-            await _unitOfWork.News.AddRange(new List<News>());
-            await _unitOfWork.RssSources.AddRange(new List<RssSourse>());
-            await _unitOfWork.SaveChangesAsync();
+                    foreach (var syndicationItem in feed.Items)
+                    {
+                        if (!currentNewsUrls.Any(url=>url.Equals(syndicationItem.Id)))
+                        {
+                            var newsDto = new NewsDto()
+                            {
+                                Id = Guid.NewGuid(),
+                                RssSourseId = rssSourse.Id,
+                                Url = syndicationItem.Id,
+                                Article = syndicationItem.Title.Text,
+                                Summary = syndicationItem.Summary.Text //clean from html(?)
+                            };
+                            news.Add(newsDto);
+                        }
+                    }
+                }
+               
+            }
+
+            return news;
 
         }
 
@@ -102,7 +129,7 @@ namespace NewsAggregators.Services.Implementation
                 Body = news.Body,
                 RssSourseId = news.RssSourseId,
                 Url = news.Url,
-                Body2 = news.Body2
+                Summary = news.Summary
             };
 
             await _unitOfWork.News.AddRange(new[] { entity });
@@ -117,7 +144,7 @@ namespace NewsAggregators.Services.Implementation
                 Body = news.Body,
                 RssSourseId = news.RssSourseId,
                 Url = news.Url,
-                Body2 = news.Body2
+                Summary = news.Summary
             };
 
             await _unitOfWork.News.AddRange(new []{entity});
@@ -132,9 +159,10 @@ namespace NewsAggregators.Services.Implementation
                 Body = ent.Body,
                 RssSourseId = ent.RssSourseId,
                 Url = ent.Url,
-                Body2 = ent.Body2
+                Summary = ent.Summary
             }).ToList();
             await _unitOfWork.News.AddRange(entities);
+            await _unitOfWork.SaveChangesAsync();
         }
 
         public async Task<int> EditNews(NewsDto news)
@@ -156,7 +184,7 @@ namespace NewsAggregators.Services.Implementation
                 Body = dto.Body,
                 RssSourseId = dto.RssSourseId,
                 Url = dto.Url,
-                Body2 = dto.Body2
+                Summary = dto.Summary
             };
         }
     }

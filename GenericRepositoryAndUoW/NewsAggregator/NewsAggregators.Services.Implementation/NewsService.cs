@@ -4,6 +4,7 @@ using System.Linq;
 using System.ServiceModel.Syndication;
 using System.Threading.Tasks;
 using System.Xml;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using NewsAggregator.Core.DataTransferObjects;
@@ -18,11 +19,14 @@ namespace NewsAggregators.Services.Implementation
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IConfiguration _configuration;
+        private readonly IMapper _mapper;
+
         public NewsService(IUnitOfWork unitOfWork,
-            IConfiguration configuration)
+            IConfiguration configuration, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _configuration = configuration;
+            _mapper = mapper;
         }
 
         public async Task<IEnumerable<NewsDto>> GetNewsBySourseId(Guid? id)
@@ -38,48 +42,26 @@ namespace NewsAggregators.Services.Implementation
                     .ToListAsync()
                 : await _unitOfWork.News.FindBy(n => n != null).ToListAsync();
 
+            return news.Select(n => _mapper.Map<NewsDto>(n)).ToList();
 
-
-            return news.Select(n => new NewsDto()
-            {
-                Id = n.Id,
-                Article = n.Article,
-                Body = n.Body,
-                RssSourseId = n.RssSourseId,
-                Url = n.Url,
-                Summary = n.Summary
-            }).ToList();
         }
 
         public async Task<NewsDto> GetNewsById(Guid id)
         {
             var entity = await _unitOfWork.News.GetById(id);
-            return new NewsDto()
-            {
-                Id = entity.Id,
-                Article = entity.Article,
-                Body = entity.Body,
-                RssSourseId = entity.RssSourseId,
-                Url = entity.Url,
-                Summary = entity.Summary
-            };
+            return _mapper.Map<NewsDto>(entity);
         }
 
         public async Task<NewsWithRssNameDto> GetNewsWithRssSourseNameById(Guid id)
         {
             var result = await _unitOfWork.News
                 .FindBy(n => n.RssSourseId.HasValue,
-                    n => n.RssSourse, n => n.Comments)
-                .Select(n => new NewsWithRssNameDto()
-                {
-                    Id = n.Id,
-                    Article = n.Article,
-                    Body = n.Body,
-                    Summary = n.Summary,
-                    Url = n.Url,
-                    RssSourseId = n.RssSourseId,
-                    RssSourseName = n.RssSourse.Name
-                }).FirstOrDefaultAsync();
+                    n => n.RssSourse, n => n.Comments).FirstOrDefaultAsync();
+
+            var mappingResult = _mapper.Map<NewsWithRssNameDto>(result);
+
+            mappingResult.RssSourseName = result.RssSourse.Name;
+            
             return result;
         }
 

@@ -12,6 +12,8 @@ using NewsAggregator.DAL.Repositories.Implementation;
 using NewsAggregator.DAL.Repositories.Interfaces;
 using NewsAggregator.Filters;
 using NewsAggregators.Services.Implementation;
+using AutoMapper;
+
 
 namespace NewsAggregator
 {
@@ -44,6 +46,8 @@ namespace NewsAggregator
 
             services.AddScoped<CheckDataFilterAttribute>();
             services.AddScoped<CustomExceptionFilterAttribute>();
+
+            services.AddAutoMapper(typeof(Startup));
 
             services.AddControllersWithViews()
                 .AddMvcOptions(opt

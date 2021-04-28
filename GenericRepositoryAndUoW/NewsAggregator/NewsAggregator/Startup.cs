@@ -59,7 +59,7 @@ namespace NewsAggregator
                 mc.AddProfile(new AutoMapping());
             });
 
-            IMapper mapper = mapperConfig.CreateMapper();
+            var mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);
 
 
@@ -94,6 +94,7 @@ namespace NewsAggregator
                 .AddMvcOptions(opt
                     =>
                 {
+                    //opt.MaxModelValidationErrors = 50;
                     opt.Filters.Add(new ChromeFilterAttribute(14, 20));
                     opt.Filters.Add(typeof(CustomExceptionFilterAttribute));
                 });

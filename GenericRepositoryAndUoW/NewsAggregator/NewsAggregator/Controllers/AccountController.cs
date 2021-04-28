@@ -34,7 +34,9 @@ namespace NewsAggregator.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (ModelState.IsValid)
+            var passValidationMessage = PasswordValidation(model.Password);
+
+            if (ModelState.IsValid && string.IsNullOrEmpty(passValidationMessage))
             {
                 var passwordHash = _userService.GetPasswordHash(model.Password);
 
@@ -51,9 +53,25 @@ namespace NewsAggregator.Controllers
                 }
                 return BadRequest(model);
             }
+
+            ModelState.AddModelError("", passValidationMessage);
+
             return View(model);
         }
 
+        private string PasswordValidation(string password)
+        {
+            //todo logic
+            return "1231231";
+        }
+
+        [AcceptVerbs("Get", "Post")]
+        public async Task<IActionResult> CheckEmail(string email)
+        {
+            return (await _userService.GetUserByEmail(email)) != null 
+                ? Json(false) 
+                : Json(true);
+        }
 
         [HttpGet]
         public IActionResult Login(string returnUrl)

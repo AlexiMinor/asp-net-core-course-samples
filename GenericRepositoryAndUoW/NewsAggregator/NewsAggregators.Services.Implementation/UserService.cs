@@ -32,6 +32,7 @@ namespace NewsAggregators.Services.Implementation
 
         public string GetPasswordHash(string modelPassword)
         {
+            const string specialValue = "123123123132";
             var sha256 = new SHA256CryptoServiceProvider();
             var sha256data = sha256.ComputeHash(Encoding.UTF8.GetBytes(modelPassword));
             var hashedPassword = Encoding.UTF8.GetString(sha256data);

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 using NewsAggregator.Core.DataTransferObjects;
 using NewsAggregator.DAL.Repositories.Implementation;
@@ -11,10 +12,12 @@ namespace NewsAggregator.Core.Services.Interfaces
     public class RssSourseService : IRssSourseService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
 
-        public RssSourseService(IUnitOfWork unitOfWork)
+        public RssSourseService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
+            _mapper = mapper;
         }
 
 
@@ -27,6 +30,12 @@ namespace NewsAggregator.Core.Services.Interfaces
                     Name = sourse.Name,
                     Url = sourse.Url
                 }).ToListAsync();
+        }
+
+        public async Task<IEnumerable<RssSourseDto>> GetRssSoursesByIds(IEnumerable<Guid> ids)
+        {
+            return await _unitOfWork.RssSources.FindBy(sourse => ids.Contains(sourse.Id))
+                .Select(sourse => _mapper.Map<RssSourseDto>(sourse)).ToListAsync();
         }
 
         public async Task<RssSourseDto> GetRssSourseById(Guid id)

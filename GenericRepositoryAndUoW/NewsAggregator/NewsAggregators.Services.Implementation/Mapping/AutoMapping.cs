@@ -12,6 +12,12 @@ namespace NewsAggregators.Services.Implementation.Mapping
         public AutoMapping()
         {
             CreateMap<News, NewsDto>();
+            CreateMap<News, NewsWithRssNameDto>()
+                .ForMember(dto => dto.RssSourseName,
+                    opt
+                        =>opt.MapFrom(news => news.RssSourse.Name)
+                );
+            CreateMap<RssSourse, RssSourseDto>();
 
             CreateMap<User, UserDto>();
             CreateMap<UserDto, User>();

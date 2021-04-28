@@ -17,7 +17,7 @@ namespace NewsAggregator.Controllers
 {
     //[Authorize(Policy = "18+Content")]
     //[Authorize(Roles = "user")]
-    [Authorize(Roles = "Admin, User")]
+    //[Authorize(Roles = "Admin, User")]
     public class NewsController : Controller
     {
         private readonly INewsService _newsService;
@@ -36,12 +36,20 @@ namespace NewsAggregator.Controllers
         }
 
         // GET: News
-        //[Route("Лист_новостей")]
         public async Task<IActionResult> Index(Guid? sourseId, int page = 1)
         {
-        
             var news = (await _newsService.GetNewsBySourseId(sourseId))
-                .ToList();
+                .ToList(); 
+            //
+            //TODO get information about all rssSourses from news 
+            //Variant 1: add object to dto + get all news with rss sourse as inner rssSourse object (for each entity)
+            //var rssSourses = news.Select(dto => dto.RssSourse).Distinct().ToList();
+            // (size of dto)*News.Count 
+
+            //Variant2
+            var rssSourses = _rssSourseService.GetRssSoursesByIds(
+                news.Select(dto => dto.RssSourseId.GetValueOrDefault()).Distinct().ToArray()); //(size of dto)*N(unique rss from news)
+
 
             var pageSize = 500;
 

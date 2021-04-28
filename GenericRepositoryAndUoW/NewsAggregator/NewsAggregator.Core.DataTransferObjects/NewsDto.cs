@@ -9,7 +9,6 @@ namespace NewsAggregator.Core.DataTransferObjects
         public string Url { get; set; }
         public string Body { get; set; }
         public string Summary { get; set; }
-
         public Guid? RssSourseId { get; set; }
     }
 }

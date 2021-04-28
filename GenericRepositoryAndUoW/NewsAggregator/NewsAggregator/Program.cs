@@ -15,8 +15,6 @@ namespace NewsAggregator
     {
         public static void Main(string[] args)
         {
-            
-
             Log.Logger = new LoggerConfiguration()
                 .MinimumLevel.Override("Microsoft", LogEventLevel.Warning)
                 .Enrich.FromLogContext()

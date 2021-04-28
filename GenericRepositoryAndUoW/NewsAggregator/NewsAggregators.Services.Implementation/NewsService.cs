@@ -31,21 +31,28 @@ namespace NewsAggregators.Services.Implementation
 
         public async Task<IEnumerable<NewsDto>> GetNewsBySourseId(Guid? id)
         {
-            if (!id.HasValue)
+            try
             {
-                Log.Warning("Id in NewsService.GetNewsBySourseId was null");
+                if (!id.HasValue)
+                {
+                    Log.Warning("Id in NewsService.GetNewsBySourseId was null");
+                }
+
+                var news = id.HasValue
+                    ? await _unitOfWork.News.FindBy(
+                            n => n.RssSourseId.Equals(id.GetValueOrDefault()))
+                        .ToListAsync()
+                    : await _unitOfWork.News.FindBy(n => n != null)
+                        .ToListAsync();
+
+                return news.Select(n => _mapper.Map<NewsDto>(n)).ToList();
             }
-
-            var news = id.HasValue
-                ? await _unitOfWork.News.FindBy(n
-                        => n.RssSourseId.Equals(id.GetValueOrDefault()))
-                    .ToListAsync()
-                : await _unitOfWork.News.FindBy(n => n != null).ToListAsync();
-
-
-
-            return news.Select(n => _mapper.Map<NewsDto>(n)).ToList();
-
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+            
         }
 
         public async Task<NewsDto> GetNewsById(Guid id)

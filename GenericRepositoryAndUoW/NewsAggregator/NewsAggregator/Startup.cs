@@ -44,10 +44,12 @@ namespace NewsAggregator
             services.AddTransient<IRepository<RssSourse>, RssSourseRepository>(); // for all repositories
             services.AddTransient<IRepository<User>, UserRepository>(); // for all repositories
             services.AddTransient<IRepository<Role>, RoleRepository>(); // for all repositories
+            services.AddTransient<IRepository<Comment>, CommentsRepository>(); // for all repositories
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<INewsService, NewsService>();
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
+            services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<IRssSourseService, RssSourseService>();
             services.AddTransient<OnlinerParser>();
             services.AddTransient<TutByParser>();
@@ -96,7 +98,7 @@ namespace NewsAggregator
                 {
                     //opt.MaxModelValidationErrors = 50;
                     opt.Filters.Add(new ChromeFilterAttribute(14, 20));
-                    opt.Filters.Add(typeof(CustomExceptionFilterAttribute));
+                    //opt.Filters.Add(typeof(CustomExceptionFilterAttribute));
                 });
 
         }

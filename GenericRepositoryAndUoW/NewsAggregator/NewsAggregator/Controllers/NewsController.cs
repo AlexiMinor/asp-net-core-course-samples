@@ -21,18 +21,21 @@ namespace NewsAggregator.Controllers
     public class NewsController : Controller
     {
         private readonly INewsService _newsService;
+        private readonly ICommentService _commentService;
         private readonly IRssSourseService _rssSourseService;
         private readonly OnlinerParser _onlinerParser;
         private readonly TutByParser _tutByParser;
 
         public NewsController(INewsService newsService, 
             IRssSourseService rssSourse,
-            OnlinerParser onlinerParser, TutByParser tutByParser)
+            OnlinerParser onlinerParser, TutByParser tutByParser, 
+            ICommentService commentService)
         {
             _newsService = newsService;
             _rssSourseService = rssSourse;
             _onlinerParser = onlinerParser;
             _tutByParser = tutByParser;
+            _commentService = commentService;
         }
 
         // GET: News
@@ -85,7 +88,8 @@ namespace NewsAggregator.Controllers
                 return NotFound();
             }
 
-            var viewModel = new NewsWithRssNameDto()
+            var comments = await _commentService.GetCommentsByNewsId(sourse.Id);
+            var viewModel = new NewsWithCommentsViewModel()
             {
                 Id = sourse.Id,
                 Article = sourse.Article,
@@ -93,7 +97,8 @@ namespace NewsAggregator.Controllers
                 Summary = sourse.Summary,
                 Url = sourse.Url,
                 RssSourseId = sourse.RssSourseId,
-                RssSourseName = sourse.RssSourseName // Null reference exception -> RssSourse is null
+                RssSourseName = sourse.RssSourseName,
+                Comments = comments
             };
 
             return View(viewModel);

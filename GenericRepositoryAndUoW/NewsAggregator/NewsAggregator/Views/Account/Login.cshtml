@@ -5,25 +5,28 @@
 <form asp-action="Login" asp-controller="Account" asp-antiforgery="true" method="post">
     <div class="validation" asp-validation-summary="ModelOnly"></div>
     <div>
-        <input type="hidden" asp-for="ReturnUrl"/>
+        <input type="hidden" asp-for="ReturnUrl" />
         <div class="form-group">
             <label asp-for="Email">Email</label>
-            <input type="text" asp-for="Email"/>
+            <input type="text" asp-for="Email" />
             <span asp-validation-for="Email"></span>
         </div>
         <div class="form-group">
             <label asp-for="Password">Password</label>
-            <input type="password" asp-for="Password"/>
+            <input type="password" asp-for="Password" />
             <span asp-validation-for="Password"></span>
         </div>
         <div>
-            <input type="submit" value="Login"/>
+            <input type="submit" value="Login" />
         </div>
     </div>
 </form>
+
+<button id="spec-btn" class="btn btn-info" onclick="aggregateForm()">Button</button>
 
 @section Scripts
 {
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <script src="~/js/workWithDOM.js"></script>
 }

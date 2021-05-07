@@ -25,6 +25,8 @@ namespace NewsAggregators.Services.Implementation.Mapping
             CreateMap<Role, RoleDto>();
             CreateMap<RoleDto, Role>();
 
+            CreateMap<Comment, CommentDto>();
+            CreateMap<CommentDto, Comment>();
 
         }
     }

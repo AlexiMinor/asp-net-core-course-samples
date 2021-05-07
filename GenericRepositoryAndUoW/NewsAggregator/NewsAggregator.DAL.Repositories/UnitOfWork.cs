@@ -16,22 +16,26 @@ namespace NewsAggregator.DAL.Repositories.Implementation
         private readonly IRepository<User> _usersRepository; 
         private readonly IRepository<Role> _rolesRepository; 
         private readonly IRepository<RssSourse> _rssRepository;
+        private readonly IRepository<Comment> _commentRepository;
 
 
         public UnitOfWork(NewsAggregatorContext db,
             IRepository<News> newsRepository, 
             IRepository<RssSourse> rssRepository, 
             IRepository<User> usersRepository, 
-            IRepository<Role> rolesRepository)
+            IRepository<Role> rolesRepository, 
+            IRepository<Comment> commentRepository)
         {
             _db = db;
             _newsRepository = newsRepository;
             _rssRepository = rssRepository;
             _usersRepository = usersRepository;
             _rolesRepository = rolesRepository;
+            _commentRepository = commentRepository;
         }
 
         public IRepository<News> News => _newsRepository;
+        public IRepository<Comment> Comments => _commentRepository;
         public IRepository<RssSourse> RssSources => _rssRepository;
         public IRepository<User> Users => _usersRepository;
         public IRepository<Role> Roles => _rolesRepository;

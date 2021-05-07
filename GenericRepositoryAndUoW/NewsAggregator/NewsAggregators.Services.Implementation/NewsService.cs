@@ -64,8 +64,8 @@ namespace NewsAggregators.Services.Implementation
         public async Task<NewsWithRssNameDto> GetNewsWithRssSourseNameById(Guid id)
         {
             var result = await _unitOfWork.News
-                .FindBy(n => n.RssSourseId.HasValue,
-                    n => n.RssSourse, n => n.Comments).FirstOrDefaultAsync();
+                .FindBy(n => n.Id.Equals(id),
+                    n => n.RssSourse).FirstOrDefaultAsync();
 
             var mappingResult = _mapper.Map<NewsWithRssNameDto>(result);
 

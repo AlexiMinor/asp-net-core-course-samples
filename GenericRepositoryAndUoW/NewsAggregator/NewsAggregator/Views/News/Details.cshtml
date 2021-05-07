@@ -1,4 +1,4 @@
-﻿@model NewsAggregator.Core.DataTransferObjects.NewsWithRssNameDto
+﻿@model NewsAggregator.Models.ViewModels.News.NewsWithCommentsViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -9,6 +9,26 @@
 <div>
     @Html.Raw(Model.Body)
 </div>
+
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
+
+
+<div class="row ">
+    <button id="comments-display-switcher" class="btn btn-primary col-sm-12" onclick="toggleComments('@Model.Id')">Display comments</button>
+    <div class="container">
+        <div id="comments-container" class="row">
+            @*@foreach (var comment in Model.Comments)
+        {
+            @await Html.PartialAsync("CommentPartial", comment)
+        }*@
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/js/comments.js"></script>
+}
+

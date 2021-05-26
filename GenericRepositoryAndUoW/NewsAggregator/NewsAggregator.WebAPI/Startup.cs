@@ -11,12 +11,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Threading.Tasks;
 using AutoMapper;
 using Hangfire;
 using Hangfire.SqlServer;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using NewsAggregator.Core.Services.Interfaces;
 using NewsAggregator.DAL.Core;
 using NewsAggregator.DAL.Core.Entities;
@@ -24,6 +27,7 @@ using NewsAggregator.DAL.CQRS.QueryHandlers;
 using NewsAggregator.DAL.Repositories.Implementation;
 using NewsAggregator.DAL.Repositories.Implementation.Repositories;
 using NewsAggregator.DAL.Repositories.Interfaces;
+using NewsAggregator.WebAPI.Auth;
 using NewsAggregators.Services.Implementation;
 using NewsAggregators.Services.Implementation.Mapping;
 
@@ -58,6 +62,7 @@ namespace NewsAggregator.WebAPI
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<IRssSourseService, RssSourseCqsService>();
+            services.AddScoped<IJwtAuthManager, JwtAuthManager>();
 
             services.AddHangfire(conf => conf
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
@@ -84,6 +89,24 @@ namespace NewsAggregator.WebAPI
 
             services.AddMediatR(typeof(GetRssSourseByIdQueryHandler).GetTypeInfo().Assembly);
 
+            services.AddAuthentication(opt =>
+            {
+                opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            })
+                .AddJwtBearer(opt =>
+            {
+                opt.RequireHttpsMetadata = false;
+                opt.SaveToken = true;
+                opt.TokenValidationParameters = new TokenValidationParameters()
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+
             services.AddControllers();
             services.AddSwaggerGen(c =>
             {
@@ -106,11 +129,11 @@ namespace NewsAggregator.WebAPI
             
             var newsService = serviceProvider.GetService(typeof(INewsService)) as INewsService;
             RecurringJob.AddOrUpdate(()=> newsService.RateNews(), "0,15,30,45 * * * *");
-
+           
             app.UseHttpsRedirection();
-
             app.UseRouting();
-
+           
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

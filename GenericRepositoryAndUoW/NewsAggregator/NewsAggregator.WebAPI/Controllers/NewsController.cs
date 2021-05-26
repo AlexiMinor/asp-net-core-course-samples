@@ -34,8 +34,9 @@ namespace NewsAggregator.WebAPI.Controllers
             return Ok(news);
         }
 
+       
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get(string name, string url, Guid sourseId)
         {
             var news = await _newsService.GetNewsBySourseId(null);
 

@@ -9,6 +9,7 @@ using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -58,11 +59,12 @@ namespace NewsAggregator.WebAPI
             services.AddTransient<IRepository<Comment>, CommentsRepository>(); // for all repositories
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<INewsService, NewsCqsService>();
-            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUserService, UserCqrsService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<ICommentService, CommentService>();
             services.AddScoped<IRssSourseService, RssSourseCqsService>();
             services.AddScoped<IJwtAuthManager, JwtAuthManager>();
+            services.AddScoped<IRefreshTokenService, RefreshTokenCqrsService>();
 
             services.AddHangfire(conf => conf
                 .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
@@ -98,12 +100,15 @@ namespace NewsAggregator.WebAPI
             {
                 opt.RequireHttpsMetadata = false;
                 opt.SaveToken = true;
+                
                 opt.TokenValidationParameters = new TokenValidationParameters()
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(Configuration["Jwt:Key"])),
                     ValidateIssuer = false,
-                    ValidateAudience = false
+                    ValidateAudience = false,
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
                 };
             });
 
@@ -122,6 +127,10 @@ namespace NewsAggregator.WebAPI
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new OpenApiInfo { Title = "NewsAggregator.WebAPI", Version = "v1" });
+                var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.XML";
+                var xmlPath = Path.Combine(xmlFile);
+
+                c.IncludeXmlComments(xmlPath);
             });
         }
 

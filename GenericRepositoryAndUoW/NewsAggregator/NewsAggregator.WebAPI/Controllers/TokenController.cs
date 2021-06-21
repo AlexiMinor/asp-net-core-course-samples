@@ -23,34 +23,6 @@ namespace NewsAggregator.WebAPI.Controllers
 
         [AllowAnonymous]
         [HttpPost]
-        [Route("Login")]
-        public IActionResult Login([FromBody]LoginRequest request)
-        {
-            JwtAuthResult jwtResult;
-            if (request.Email=="admin@ema.il")
-            {
-                var claims = new[]
-                {
-                    new Claim(ClaimTypes.Email, request.Email),
-                    new Claim(ClaimTypes.Role, "Admin")
-                };
-
-                jwtResult = _jwtAuthManager.GenerateTokens(request.Email, claims);
-            }
-            else
-            {
-                var claims = new[]
-                {
-                    new Claim(ClaimTypes.Email, request.Email),
-                    new Claim(ClaimTypes.Role, "User")
-                };
-                jwtResult = _jwtAuthManager.GenerateTokens(request.Email, claims);
-            }
-            return Ok(jwtResult);
-        }
-
-        [AllowAnonymous]
-        [HttpPost]
         [Route("RefreshToken")]
         public IActionResult RefreshToken([FromBody]string refresh)
         {

@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>NewsAggregator.WebAPI</name>
+    </assembly>
+    <members>
+        <member name="M:NewsAggregator.WebAPI.Controllers.AuthController.Refresh(NewsAggregator.WebAPI.Requests.RefreshTokenRequest)">
+            <summary>
+            refresh token
+            </summary>
+            <param name="request">object includes refresh token string value</param>
+            <returns></returns>
+        </member>
+        <member name="M:NewsAggregator.WebAPI.Controllers.NewsController.Get">
+            <summary>
+            Get news from database
+            </summary>
+            <returns>News from DB</returns>
+        </member>
+    </members>
+</doc>

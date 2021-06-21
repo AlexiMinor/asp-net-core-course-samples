@@ -1,14 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Security.Cryptography;
-using System.ServiceModel.Syndication;
 using System.Text;
 using System.Threading.Tasks;
-using System.Xml;
 using AutoMapper;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using NewsAggregator.Core.DataTransferObjects;
 using NewsAggregator.Core.Services.Interfaces;
 using NewsAggregator.DAL.Core.Entities;
@@ -83,13 +78,21 @@ namespace NewsAggregators.Services.Implementation
                 throw;
             }
         }
-    }
 
-    public interface IUserService
-    {
-        string GetPasswordHash(string modelPassword);
-        Task<bool> RegisterUser(UserDto model);
-        Task<UserDto> GetUserByEmail(string email);
+        public async Task<string> GetUserRoleNameByEmail(string email)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<bool> CheckAuthIsValid(UserDto model)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task<string> GetUserEmailByRefreshToken(string refreshToken)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

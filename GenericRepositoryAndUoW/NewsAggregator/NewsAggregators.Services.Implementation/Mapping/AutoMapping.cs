@@ -25,6 +25,8 @@ namespace NewsAggregators.Services.Implementation.Mapping
             CreateMap<Comment, CommentDto>();
             CreateMap<CommentDto, Comment>();
 
+            CreateMap<RefreshToken, RefreshTokenDto>();
+            CreateMap<RefreshTokenDto, RefreshToken>();
         }
     }
 }
